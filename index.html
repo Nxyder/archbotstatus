@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bot Status Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #05070a;
+      --card-bg: rgba(15, 23, 42, 0.6);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-glow: rgba(59, 130, 246, 0.4);
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #64748b;
+
+      --accent-gold: #f59e0b;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-cyan: #06b6d4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.12), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.08), transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .header-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .header-title .bot-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse 1.5s infinite;
+    }
+
+    .status-badge.offline {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.25);
+      color: var(--accent-red);
+    }
+
+    .status-badge.offline .dot {
+      background: var(--accent-red);
+      box-shadow: none;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.8); }
+    }
+
+    /* SYSTEM STATUS BAR */
+    .telemetry-bar {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--card-border);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-sub);
+      margin-bottom: 20px;
+    }
+
+    .telemetry-bar span strong {
+      color: var(--text-muted);
+    }
+
+    /* CARD COMPONENTS */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .card.updating {
+      border-color: var(--card-border-glow);
+    }
+
+    /* BALANCE SECTION */
+    .balance-card {
+      text-align: center;
+      padding: 32px 20px;
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .balance-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .balance-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 8px 0;
+      letter-spacing: -1.5px;
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .balance-amount.pulse {
+      transform: scale(1.03);
+      color: var(--accent-gold);
+    }
+
+    /* METRICS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card.updating {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .stat-value.green { color: var(--accent-green); }
+    .stat-value.yellow { color: var(--accent-gold); }
+    .stat-value.purple { color: var(--accent-purple); }
+    .stat-value.cyan { color: var(--accent-cyan); }
+
+    /* DATA ROWS */
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 14px;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.825rem;
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .data-row:first-of-type {
+      padding-top: 0;
+    }
+
+    .row-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .row-value {
+      font-weight: 600;
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .row-value.location { color: var(--accent-blue); }
+    .row-value.status { color: var(--accent-green); }
+    .row-value.status.offline { color: var(--accent-red); }
+
+    .payment-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      margin-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .payment-total .value {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-gold);
+      font-size: 1.1rem;
+    }
+
+    /* BADGES */
+    .badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge.yes { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+    .badge.no { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      margin-top: 24px;
+      padding-bottom: 12px;
+    }
+
+    @media (min-width: 480px) {
+      .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header">
+    <div class="header-title">
+      <h1>Bot Overview</h1>
+      <div class="bot-id" id="botId">ID: 1415926535</div>
+    </div>
+    <div class="status-badge" id="statusBadge">
+      <span class="dot"></span>
+      <span id="liveText">Live</span>
+    </div>
+  </div>
+
+  <div class="telemetry-bar">
+    <span>LATENCY: <strong id="latency">0ms</strong></span>
+    <span>UPDATES: <strong id="updateCount">0</strong></span>
+  </div>
+
+  <div class="card balance-card" id="balanceCard">
+    <div class="balance-label">Total Balance</div>
+    <div class="balance-amount" id="balance">$0</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card" id="statSell">
+      <div class="stat-label">Sells</div>
+      <div class="stat-value green" id="sellCount">0</div>
+    </div>
+    <div class="stat-card" id="statLogins">
+      <div class="stat-label">Logins</div>
+      <div class="stat-value yellow" id="logins">0</div>
+    </div>
+    <div class="stat-card" id="statReconnects">
+      <div class="stat-label">Reconnects</div>
+      <div class="stat-value purple" id="reconnects">0</div>
+    </div>
+    <div class="stat-card" id="statUptime">
+      <div class="stat-label">Uptime</div>
+      <div class="stat-value cyan" id="uptime">0m</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Location & Status</div>
+    <div class="data-row">
+      <span class="row-label">Location</span>
+      <span class="row-value location" id="location">-</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Status Message</span>
+      <span class="row-value status" id="statusDetail">-</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Next Sale</span>
+      <span class="row-value" id="nextSell">-</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Time to Payment</span>
+      <span class="row-value" id="timeToPayment">-</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Last Payment</span>
+      <span class="row-value" id="lastPayment">-</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Paid Today</span>
+      <span class="row-value" id="todayPaid">-</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Payments Breakdown</div>
+    <div class="data-row">
+      <span class="row-label">The_Empire</span>
+      <span class="row-value" id="payTheEmpire" style="color: var(--accent-gold);">$0</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Bilalskingdom</span>
+      <span class="row-value" id="payBilalskingdom" style="color: var(--accent-green);">$0</span>
+    </div>
+    <div class="data-row">
+      <span class="row-label">Matthias__2</span>
+      <span class="row-value" id="payMatthias" style="color: var(--accent-purple);">$0</span>
+    </div>
+    
+    <div class="payment-total">
+      <span class="label">Total Paid Out</span>
+      <span class="value" id="payTotal">$0</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span id="lastUpdate">Connecting to realtime channel...</span>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = 'https://rrrgedxoxkeeoyjkiqpt.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycmdlZHhveGtlZW95amtpcXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzQ0MzYsImV4cCI6MjEwMTk1MDQzNn0.tu0GSs4Sn19XxxT1pxZM3rDG_nXPRMmUCKmcimnqk9U';
+  const BOT_ID = '1415926535';
+
+  let updateCount = 0;
+  let lastUpdateTime = Date.now();
+
+  const $ = (id) => document.getElementById(id);
+
+  const elements = {
+    balance: $('balance'),
+    balanceCard: $('balanceCard'),
+    sellCount: $('sellCount'),
+    logins: $('logins'),
+    reconnects: $('reconnects'),
+    uptime: $('uptime'),
+    location: $('location'),
+    statusDetail: $('statusDetail'),
+    nextSell: $('nextSell'),
+    timeToPayment: $('timeToPayment'),
+    lastPayment: $('lastPayment'),
+    todayPaid: $('todayPaid'),
+    payTheEmpire: $('payTheEmpire'),
+    payBilalskingdom: $('payBilalskingdom'),
+    payMatthias: $('payMatthias'),
+    payTotal: $('payTotal'),
+    lastUpdate: $('lastUpdate'),
+    statusBadge: $('statusBadge'),
+    liveText: $('liveText'),
+    updateCount: $('updateCount'),
+    latency: $('latency'),
+    botId: $('botId')
+  };
+
+  function formatBalance(val) {
+    const num = parseFloat(val) || 0;
+    return '$' + num.toLocaleString('en-US');
+  }
+
+  function formatCurrency(val) {
+    return '$' + Number(val || 0).toLocaleString('en-US');
+  }
+
+  function formatTime(timestamp) {
+    if (!timestamp || timestamp === 'Never') return 'Never';
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch { return timestamp; }
+  }
+
+  function formatUptime(seconds) {
+    const num = parseInt(seconds) || 0;
+    const days = Math.floor(num / 86400);
+    const hours = Math.floor((num % 86400) / 3600);
+    const minutes = Math.floor((num % 3600) / 60);
+
+    if (days > 0) return days + 'd ' + hours + 'h';
+    if (hours > 0) return hours + 'h ' + minutes + 'm';
+    return minutes + 'm';
+  }
+
+  function formatDate(timestamp) {
+    if (!timestamp) return '-';
+    try {
+      const date = new Date(timestamp);
+      return date.toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch { return timestamp; }
+  }
+
+  function updateUI(data) {
+    if (!data) return;
+
+    const now = Date.now();
+    const latency = Math.max(0, now - lastUpdateTime);
+    lastUpdateTime = now;
+    updateCount++;
+
+    elements.latency.textContent = latency + 'ms';
+    elements.updateCount.textContent = updateCount;
+    elements.balance.textContent = formatBalance(data.balans);
+
+    // Visual Feedback Animation
+    elements.balanceCard.classList.add('updating');
+    elements.balance.classList.add('pulse');
+    setTimeout(() => {
+      elements.balanceCard.classList.remove('updating');
+      elements.balance.classList.remove('pulse');
+    }, 300);
+
+    // Online Status
+    const isOnline = data.status && !data.status.toLowerCase().includes('offline') && !data.status.toLowerCase().includes('error');
+    elements.statusBadge.className = 'status-badge' + (isOnline ? '' : ' offline');
+    elements.liveText.textContent = isOnline ? 'Live' : 'Offline';
+
+    // Metrics
+    elements.sellCount.textContent = data.sell_count || '0';
+    elements.logins.textContent = data.logins || '0';
+    elements.reconnects.textContent = data.reconnects || '0';
+    elements.uptime.textContent = formatUptime(data.uptime);
+
+    // Detailed Info
+    elements.location.textContent = data.location || 'Unknown';
+    elements.statusDetail.textContent = data.status || 'Unknown';
+    elements.statusDetail.className = 'row-value status' + (isOnline ? '' : ' offline');
+
+    elements.nextSell.textContent = data.next_sell || 'N/A';
+    elements.timeToPayment.textContent = data.time_to_payment || 'N/A';
+    elements.lastPayment.textContent = formatTime(data.payments_last);
+
+    const todayPaid = data.today_paid === 'Yes';
+    elements.todayPaid.innerHTML = todayPaid
+      ? '<span class="badge yes">Yes</span>'
+      : '<span class="badge no">No</span>';
+
+    // Financial Distribution
+    elements.payTheEmpire.textContent = formatCurrency(data.payments_the_empire);
+    elements.payBilalskingdom.textContent = formatCurrency(data.payments_bilalskingdom);
+    elements.payMatthias.textContent = formatCurrency(data.payments_matthias);
+    elements.payTotal.textContent = formatCurrency(data.payments_total);
+
+    elements.lastUpdate.textContent = 'Last update: ' + formatDate(data.timestamp);
+  }
+
+  function initRealtime() {
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    supabaseClient
+      .channel('bot_stats_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bot_stats', filter: `id=eq.${BOT_ID}` },
+        (payload) => {
+          if (payload.new) updateUI(payload.new);
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          elements.lastUpdate.textContent = 'Realtime connected - waiting for updates...';
+        }
+      });
+  }
+
+  function init() {
+    elements.botId.textContent = `ID: ${BOT_ID}`;
+    initRealtime();
+
+    fetch(`${SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.length > 0) updateUI(data[0]);
+    })
+    .catch(err => console.error('Error loading initial state:', err));
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
