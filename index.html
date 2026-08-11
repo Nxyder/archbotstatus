@@ -525,8 +525,8 @@
     <div class="card">
       <div class="sec-title">Payouts</div>
       <div class="data-row"><span class="row-label">Empire</span><span class="row-val gold">$1,000,000</span></div>
-      <div class="data-row"><span class="row-label">Gojo</span><span class="row-val blue">$428,571</span></div>
-      <div class="data-row"><span class="row-label">Matthias (30%)</span><span class="row-val purple" id="payMatthias">$0</span></div>
+      <div class="data-row"><span class="row-label">Gojo</span><span class="row-val blue">$500,000</span></div>
+      <div class="data-row"><span class="row-label">Matthias</span><span class="row-val purple" id="payMatthias">$0</span></div>
       <div class="data-row"><span class="row-label">Fees</span><span class="row-val red" id="payExpenses">$0</span></div>
       <div class="pay-total"><span>Share</span><span class="val" id="payYourShare">$0</span></div>
     </div>
@@ -544,6 +544,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const MATTHIAS_DAILY_FIXED = 3000000;
+
   const SUPABASE_URL = 'https://rrrgedxoxkeeoyjkiqpt.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycmdlZHhveGtlZW95amtpcXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzQ0MzYsImV4cCI6MjEwMTk1MDQzNn0.tu0GSs4Sn19XxxT1pxZM3rDG_nXPRMmUCKmcimnqk9U';
   const BOT_ID = '1415926535';
@@ -710,7 +712,7 @@
       ? '<span class="badge yes">Yes</span>'
       : '<span class="badge no">No</span>';
 
-    // Update payouts
+    // Update payouts - now Matthias gets $3M daily fixed
     updatePayouts(data.balans, data.expenses);
 
     // Highlight changes
@@ -735,15 +737,19 @@
     const balance = parseFloat(balans) || 0;
     const exp = parseFloat(expenses) || 0;
 
+    // Fixed payouts
     const empirePay = 1000000;
-    const bilalPay = 428571;
-    const remainingAfterFixed = Math.max(0, balance - empirePay - bilalPay);
-    const matthiasPay = remainingAfterFixed * 0.30;
-    const yourProfit = Math.max(0, remainingAfterFixed - matthiasPay - exp);
+    const gojoPay = 500000;
+    const matthiasPay = MATTHIAS_DAILY_FIXED; // $3,000,000 fixed daily
+
+    // Remaining after fixed payouts
+    const remainingAfterFixed = Math.max(0, balance - empirePay - gojoPay - matthiasPay);
+    // Your share is what remains after fees
+    const yourShare = Math.max(0, remainingAfterFixed - exp);
 
     ui.payMatthias.textContent = formatCur(matthiasPay);
     ui.payExpenses.textContent = formatCur(exp);
-    ui.payYourShare.textContent = formatCur(yourProfit);
+    ui.payYourShare.textContent = formatCur(yourShare);
   }
 
   function flashElement(elementId) {
