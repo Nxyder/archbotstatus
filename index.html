@@ -3,607 +3,542 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Bot Controller Dashboard</title>
-  
+  <title>MoneyBot App</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     :root {
       --bg: #000000;
-      --card: #0d0e12;
+      --card-bg: rgba(255, 255, 255, 0.015);
       --border: rgba(255, 255, 255, 0.08);
       --text: #ffffff;
-      --muted: #8e8e93;
-      --nav: rgba(13, 14, 18, 0.85);
+      --muted: #666666;
       --blue: #007aff;
-      --green: #30d158;
+      --green: #32d74b;
       --red: #ff453a;
       --gold: #ffd60a;
       --purple: #bf5af2;
+      --orange: #ff9500;
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     [data-theme="light"] {
-      --bg: #f2f2f7;
-      --card: #ffffff;
-      --border: rgba(0, 0, 0, 0.06);
+      --bg: #f4f4f7;
+      --card-bg: #ffffff;
+      --border: rgba(0, 0, 0, 0.05);
       --text: #000000;
-      --muted: #6e6e73;
-      --nav: rgba(255, 255, 255, 0.85);
+      --muted: #999999;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: var(--font-main);
       background-color: var(--bg);
       color: var(--text);
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      transition: background-color 0.25s, color 0.25s;
+      transition: background-color 0.3s;
+      overflow-x: hidden;
+      position: relative;
     }
 
+    /* --- STARFIELD BACKGROUND --- */
+    .starfield {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    [data-theme="light"] .starfield { display: none; }
+
+    .star {
+      position: absolute;
+      background-color: #ffffff;
+      border-radius: 50%;
+      animation: flicker infinite linear;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    .star:nth-child(1)  { width: 1px; height: 1px; top: 10%; left: 15%; animation-duration: 2s; animation-delay: 0.5s; }
+    .star:nth-child(2)  { width: 2px; height: 2px; top: 20%; left: 80%; animation-duration: 3s; animation-delay: 1s; }
+    .star:nth-child(3)  { width: 1px; height: 1px; top: 40%; left: 30%; animation-duration: 2.5s; }
+    .star:nth-child(4)  { width: 1px; height: 1px; top: 70%; left: 10%; animation-duration: 4s; animation-delay: 2s; }
+    .star:nth-child(5)  { width: 2px; height: 2px; top: 80%; left: 60%; animation-duration: 3s; animation-delay: 1.5s; }
+    .star:nth-child(6)  { width: 1px; height: 1px; top: 15%; left: 90%; animation-duration: 2s; }
+    .star:nth-child(7)  { width: 1px; height: 1px; top: 50%; left: 85%; animation-duration: 3.5s; animation-delay: 0.8s; }
+    .star:nth-child(8)  { width: 1px; height: 1px; top: 90%; left: 20%; animation-duration: 2.8s; }
+    .star:nth-child(9)  { width: 1px; height: 1px; top: 30%; left: 50%; animation-duration: 3s; }
+    .star:nth-child(10) { width: 1px; height: 1px; top: 60%; left: 70%; animation-duration: 2s; animation-delay: 1.2s; }
+    .star:nth-child(11) { width: 1px; height: 1px; top: 5%;  left: 40%; animation-duration: 3s; }
+    .star:nth-child(12) { width: 2px; height: 2px; top: 95%; left: 80%; animation-duration: 2.5s; }
+
+    /* --- APP LAYOUT --- */
     .app {
       width: 100%;
-      max-width: 420px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 80px;
+      max-width: 400px;
+      padding-bottom: 70px;
+      position: relative;
+      z-index: 1;
     }
 
+    /* --- HEADER --- */
     .header {
-      padding: 24px 20px 16px;
+      padding: 30px 20px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 10;
+      background-color: rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: sticky; top: 0; z-index: 10;
     }
 
-    .app-title {
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.3px;
-    }
+    [data-theme="light"] .header { background-color: rgba(244,244,247,0.8); }
 
-    .bot-id {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    .app-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.5px; }
+    .bot-id { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); margin-top: 1px; }
 
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
+    .header-actions { display: flex; align-items: center; gap: 10px; }
     .theme-btn {
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
     }
-
-    .theme-btn i {
-      width: 16px;
-      height: 16px;
-    }
+    .theme-btn:hover { color: var(--text); border-color: var(--muted); }
+    .theme-btn i { width: 14px; height: 14px; }
 
     .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(48, 209, 88, 0.12);
-      border: 1px solid rgba(48, 209, 88, 0.25);
-      padding: 6px 10px;
-      border-radius: 20px;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--green);
-      text-transform: uppercase;
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 10px; border-radius: 20px;
+      border: 1px solid var(--green);
+      font-size: 0.6rem; font-weight: 700; color: var(--green);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      box-shadow: 0 0 10px rgba(50, 215, 75, 0.15);
+      transition: all 0.3s;
     }
-
     .status-badge .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
+      width: 5px; height: 5px; border-radius: 50%; background-color: var(--green);
       animation: pulse 1.5s infinite;
+      transition: all 0.3s;
     }
+    .status-badge.offline { border-color: var(--red); color: var(--red); box-shadow: 0 0 10px rgba(255, 69, 58, 0.15); }
+    .status-badge.offline .dot { background-color: var(--red); animation: none; }
 
-    .status-badge.offline {
-      background: rgba(255, 69, 58, 0.12);
-      border-color: rgba(255, 69, 58, 0.25);
-      color: var(--red);
-    }
+    .status-badge.lobby { border-color: var(--orange); color: var(--orange); box-shadow: 0 0 10px rgba(255, 149, 0, 0.15); }
+    .status-badge.lobby .dot { background-color: var(--orange); animation: pulse 1.5s infinite; }
 
-    .status-badge.offline .dot {
-      background: var(--red);
-      animation: none;
-    }
+    .status-badge.survival { border-color: var(--green); color: var(--green); box-shadow: 0 0 10px rgba(50, 215, 75, 0.25); }
+    .status-badge.survival .dot { background-color: var(--green); animation: pulse 0.8s infinite; }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(0.8); }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
 
+    /* --- TELEMETRY --- */
     .telemetry {
-      margin: 0 20px 16px;
-      padding: 8px 14px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      display: flex;
-      justify-content: space-between;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
+      margin: 10px 20px 20px; padding: 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+      font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted);
     }
+    .telemetry strong { color: var(--text); font-weight: 400; }
 
-    .telemetry strong {
-      color: var(--text);
-    }
+    /* --- MAIN CONTENT --- */
+    .tab-content { display: none; padding: 0 20px; animation: fadeIn 0.3s ease-out; }
+    .tab-content.active { display: block; }
 
-    .tab-content {
-      display: none;
-      padding: 0 20px;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
     .card {
-      background: var(--card);
+      background-color: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+    .card:hover { border-color: var(--muted); }
+
+    .card.location-update {
+      border-color: var(--blue);
+      background-color: rgba(0, 122, 255, 0.03);
+      transition: all 0.5s;
     }
 
-    .balance-card {
-      text-align: center;
-      padding: 20px 16px;
-      background: linear-gradient(180deg, var(--card) 0%, rgba(255, 214, 10, 0.03) 100%);
-      border: 1px solid rgba(255, 214, 10, 0.18);
-      container-type: inline-size;
+    .card.location-update::after {
+      content: '●';
+      color: var(--blue);
+      float: right;
+      animation: blink 0.5s ease 3;
     }
 
-    .balance-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
-    .balance-wrap {
-      width: 100%;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 6px 0;
-    }
-
+    /* --- BALANCE --- */
+    .balance-card { text-align: center; border-color: rgba(255, 214, 10, 0.2); }
+    .balance-label { font-size: 0.65rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .balance-wrap { width: 100%; overflow: hidden; }
     .balance-amount {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: clamp(1.8rem, 10cqw, 2.5rem);
-      font-weight: 800;
-      color: var(--text);
-      white-space: nowrap;
-      transition: transform 0.2s, color 0.2s;
+      font-family: var(--font-mono); font-size: 2.2rem; font-weight: 700; color: var(--text);
+      letter-spacing: -1px; white-space: nowrap;
+      transition: color 0.3s;
     }
+    .balance-amount.pulse { animation: neon 0.5s ease-in-out; }
+    @keyframes neon { 0%, 100% { text-shadow: none; } 50% { text-shadow: 0 0 15px var(--gold); } }
 
-    .balance-amount.pulse {
-      transform: scale(1.02);
-      color: var(--gold);
-    }
-
-    .timers-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
+    /* --- TIMERS GRID --- */
+    .timers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
     .timer-box {
-      background: rgba(0, 122, 255, 0.06);
-      border: 1px solid rgba(0, 122, 255, 0.18);
-      border-radius: 14px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; display: flex; flex-direction: column; gap: 3px;
+      transition: border-color 0.3s;
     }
+    .timer-box.gold { border-color: rgba(255, 214, 10, 0.2); }
+    .timer-box.updated { border-color: var(--blue); }
+    .timer-head { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+    .timer-icon { width: 12px; height: 12px; }
+    .timer-box.gold .timer-icon { color: var(--gold); }
+    .timer-val { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; color: var(--blue); transition: color 0.3s; }
+    .timer-box.gold .timer-val { color: var(--gold); }
 
-    .timer-box.gold {
-      background: rgba(255, 214, 10, 0.06);
-      border-color: rgba(255, 214, 10, 0.18);
-    }
-
-    .timer-head {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .timer-icon {
-      width: 14px;
-      height: 14px;
-      color: var(--blue);
-      stroke-width: 2.5px;
-    }
-
-    .timer-box.gold .timer-icon {
-      color: var(--gold);
-    }
-
-    .timer-label {
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-
-    .timer-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: var(--blue);
-    }
-
-    .timer-box.gold .timer-val {
-      color: var(--gold);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .metric-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-    }
-
-    .metric-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .metric-label {
-      font-size: 0.62rem;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
-    .metric-icon {
-      width: 15px;
-      height: 15px;
-      stroke-width: 2.5px;
-    }
-
-    .metric-value {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.2rem;
-      font-weight: 700;
-    }
+    /* --- METRICS GRID --- */
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .metric-card { padding: 15px; border-radius: 10px; transition: all 0.3s; }
+    .metric-card.updated { border-color: var(--blue); background-color: rgba(0, 122, 255, 0.03); }
+    .metric-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .metric-label { font-size: 0.6rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .metric-icon { width: 14px; height: 14px; opacity: 0.7; }
+    .metric-value { font-family: var(--font-mono); font-size: 1.1rem; font-weight: 700; transition: all 0.3s; }
+    .metric-value.changed { transform: scale(1.2); }
 
     .green { color: var(--green); }
     .gold { color: var(--gold); }
     .purple { color: var(--purple); }
     .blue { color: var(--blue); }
+    .orange { color: var(--orange); }
+    .red { color: var(--red); }
 
-    .sec-title {
-      font-size: 0.68rem;
-      font-weight: 800;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 12px;
+    /* --- STATUS INDICATOR --- */
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: all 0.3s;
     }
+    .status-indicator .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      transition: all 0.3s;
+    }
+    .status-indicator.online { background: rgba(50, 215, 75, 0.1); color: var(--green); }
+    .status-indicator.online .status-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .status-indicator.offline { background: rgba(255, 69, 58, 0.1); color: var(--red); }
+    .status-indicator.offline .status-dot { background: var(--red); }
+    .status-indicator.lobby { background: rgba(255, 149, 0, 0.1); color: var(--orange); }
+    .status-indicator.lobby .status-dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+    .status-indicator.survival { background: rgba(50, 215, 75, 0.15); color: var(--green); }
+    .status-indicator.survival .status-dot { background: var(--green); box-shadow: 0 0 15px var(--green); animation: pulse 0.8s infinite; }
 
+    /* --- DATA ROWS --- */
+    .sec-title { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
     .data-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.82rem;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;
+      transition: all 0.3s;
     }
-
-    .data-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .data-row:first-of-type {
-      padding-top: 0;
-    }
-
-    .row-label {
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .row-val {
-      font-weight: 700;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      text-align: right;
-    }
-
+    .data-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .data-row:first-of-type { padding-top: 0; }
+    .data-row.updated { background-color: rgba(0, 122, 255, 0.03); margin: 0 -10px; padding: 10px; border-radius: 6px; }
+    .row-label { color: var(--muted); }
+    .row-val { font-weight: 700; font-family: var(--font-mono); text-align: right; transition: all 0.3s; }
     .row-val.location { color: var(--blue); }
-    .row-val.status { color: var(--green); }
     .row-val.status.offline { color: var(--red); }
+    .row-val.status.lobby { color: var(--orange); }
+    .row-val.status.survival { color: var(--green); }
 
-    .pay-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 12px;
-      margin-top: 8px;
-      border-top: 1px dashed var(--border);
-      font-size: 0.85rem;
-      font-weight: 700;
+    /* --- CONTROL PANEL STYLES --- */
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
-    .pay-total .val {
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--green);
-      font-size: 1.1rem;
-    }
-
-    .badge {
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.6rem;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .badge.yes {
-      background: rgba(48, 209, 88, 0.15);
-      color: var(--green);
-    }
-
-    .badge.no {
-      background: rgba(255, 69, 58, 0.15);
-      color: var(--red);
-    }
-
-    .footer {
-      text-align: center;
-      font-size: 0.65rem;
+    .cmd-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
       color: var(--muted);
-      margin-top: 12px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 420px;
-      background: var(--nav);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0 12px;
-      z-index: 100;
-    }
-
-    .nav-item {
+      padding: 14px 8px;
+      border-radius: 10px;
+      font-family: var(--font-main);
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .cmd-btn:active { transform: scale(0.93); }
+    .cmd-btn i { width: 16px; height: 16px; }
+
+    .cmd-btn.success:hover { color: var(--green); border-color: var(--green); box-shadow: 0 0 12px rgba(50, 215, 75, 0.2); }
+    .cmd-btn.danger:hover { color: var(--red); border-color: var(--red); box-shadow: 0 0 12px rgba(255, 69, 58, 0.2); }
+    .cmd-btn.warning:hover { color: var(--gold); border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 214, 10, 0.2); }
+    .cmd-btn.blue:hover { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 12px rgba(0, 122, 255, 0.2); }
+
+    /* Custom Chat Input */
+    .chat-input-wrap {
+      display: flex;
+      gap: 8px;
+      margin-top: 5px;
+    }
+
+    .chat-input-wrap input {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 0.75rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input-wrap input:focus {
+      border-color: var(--blue);
+    }
+
+    .chat-input-wrap input::placeholder {
       color: var(--muted);
-      font-size: 0.6rem;
-      font-weight: 700;
-      cursor: pointer;
-      width: 33.33%;
-      transition: color 0.2s;
     }
 
-    .nav-item.active {
-      color: var(--blue);
+    .chat-send-btn {
+      padding: 10px 16px;
+      flex-direction: row;
     }
 
-    .nav-item i {
-      width: 18px;
-      height: 18px;
+    /* --- PAYMENTS --- */
+    .pay-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 10px; margin-top: 8px; border-top: 1px dashed var(--border);
+      font-size: 0.85rem; font-weight: 700;
     }
+    .pay-total .val { font-family: var(--font-mono); color: var(--green); font-size: 1.05rem;}
+
+    .badge { padding: 3px 7px; border-radius: 4px; font-size: 0.55rem; font-weight: 700; text-transform: uppercase; }
+    .badge.yes { background-color: rgba(50, 215, 75, 0.1); color: var(--green); border: 1px solid rgba(50, 215, 75, 0.2); }
+    .badge.no { background-color: rgba(255, 69, 58, 0.1); color: var(--red); border: 1px solid rgba(255, 69, 58, 0.2); }
+
+    .footer { text-align: center; font-size: 0.6rem; color: #333; margin-top: 15px; font-family: var(--font-mono); }
+    [data-theme="light"] .footer { color: #ccc; }
+
+    /* --- BOTTOM NAV --- */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 400px;
+      background-color: rgba(0,0,0,0.8);
+      backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; padding: 10px 0; z-index: 100;
+    }
+    [data-theme="light"] .bottom-nav { background-color: rgba(255,255,255,0.9); }
+
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      color: var(--muted); font-size: 0.55rem; font-weight: 700; cursor: pointer;
+      width: 25%; transition: color 0.2s;
+    }
+    .nav-item.active { color: var(--text); }
+    .nav-item i { width: 16px; height: 16px; transition: transform 0.2s; }
+    .nav-item.active i { transform: translateY(-1px); }
+
+    /* Update notification */
+    .update-flash {
+      animation: flashUpdate 0.5s ease;
+    }
+    @keyframes flashUpdate {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
   </style>
 </head>
 <body>
 
+<div class="starfield">
+  <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+  <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+  <div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div>
+</div>
+
 <div class="app">
   <header class="header">
     <div>
-      <div class="app-title">Bot Controller</div>
-      <div class="bot-id" id="botId">ID: 1415926535</div>
+      <div class="app-title">MoneyBot</div>
+      <div class="bot-id" id="botId">ID: --</div>
     </div>
     <div class="header-actions">
       <button class="theme-btn" id="themeToggle" aria-label="Toggle Theme">
-        <i data-lucide="moon" id="themeIcon"></i>
+        <i data-lucide="sun" id="themeIcon"></i>
       </button>
-      <div class="status-badge" id="statusBadge">
+      <div class="status-badge offline" id="statusBadge">
         <span class="dot"></span>
-        <span id="liveText">Live</span>
+        <span id="liveText">Offline</span>
       </div>
     </div>
   </header>
 
   <div class="telemetry">
-    <span>LATENCY: <strong id="latency">0ms</strong></span>
-    <span>UPDATES: <strong id="updateCount">0</strong></span>
+    <span>LATENCY: <strong id="latency">--</strong></span>
+    <span>SYNC: <strong id="updateCount">0</strong></span>
+    <span id="lastUpdateTime">--</span>
   </div>
 
-  <main class="tab-content active" id="tab-dashboard">
+  <main class="tab-content active" id="tab-dashboard" role="tabpanel">
     <div class="card balance-card" id="balanceCard">
-      <div class="balance-label">Total Vault Balance</div>
+      <div class="balance-label">Vault Balance</div>
       <div class="balance-wrap">
         <div class="balance-amount" id="balance">$0</div>
       </div>
     </div>
 
     <div class="timers-grid">
-      <div class="timer-box">
-        <div class="timer-head">
-          <i data-lucide="timer" class="timer-icon"></i>
-          <span class="timer-label">Next Payment</span>
-        </div>
+      <div class="timer-box" id="timerPayment">
+        <div class="timer-head"><i data-lucide="clock" class="timer-icon"></i> Payment</div>
         <div class="timer-val" id="timeToPayment">--:--</div>
       </div>
-      <div class="timer-box gold">
-        <div class="timer-head">
-          <i data-lucide="shopping-cart" class="timer-icon"></i>
-          <span class="timer-label">Next Sell</span>
-        </div>
+      <div class="timer-box gold" id="timerSell">
+        <div class="timer-head"><i data-lucide="shopping-cart" class="timer-icon"></i> Sell</div>
         <div class="timer-val" id="nextSellMain">--:--</div>
       </div>
     </div>
 
-    <div class="grid">
-      <div class="metric-card">
-        <div class="metric-head">
-          <span class="metric-label">Sells</span>
-          <i data-lucide="shopping-bag" class="metric-icon green"></i>
-        </div>
+    <div class="metrics-grid">
+      <div class="card metric-card" id="metricSells">
+        <div class="metric-head"><span class="metric-label">Sells</span><i data-lucide="shopping-bag" class="metric-icon green"></i></div>
         <div class="metric-value green" id="sellCount">0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-head">
-          <span class="metric-label">Logins</span>
-          <i data-lucide="log-in" class="metric-icon gold"></i>
-        </div>
+      <div class="card metric-card" id="metricLogins">
+        <div class="metric-head"><span class="metric-label">Logins</span><i data-lucide="log-in" class="metric-icon gold"></i></div>
         <div class="metric-value gold" id="logins">0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-head">
-          <span class="metric-label">Reconnects</span>
-          <i data-lucide="refresh-cw" class="metric-icon purple"></i>
-        </div>
+      <div class="card metric-card" id="metricErrors">
+        <div class="metric-head"><span class="metric-label">Errors</span><i data-lucide="alert-triangle" class="metric-icon purple"></i></div>
         <div class="metric-value purple" id="reconnects">0</div>
       </div>
-      <div class="metric-card">
-        <div class="metric-head">
-          <span class="metric-label">Uptime</span>
-          <i data-lucide="clock" class="metric-icon blue"></i>
-        </div>
+      <div class="card metric-card" id="metricUptime">
+        <div class="metric-head"><span class="metric-label">Uptime</span><i data-lucide="activity" class="metric-icon blue"></i></div>
         <div class="metric-value blue" id="uptime">0m</div>
+      </div>
+    </div>
+
+    <!-- Status Indicator -->
+    <div class="card" id="statusCard">
+      <div class="sec-title">Bot Status</div>
+      <div class="status-indicator offline" id="statusIndicator">
+        <span class="status-dot"></span>
+        <span id="statusText">Offline</span>
+        <span style="margin-left:auto; font-size:0.6rem; color:var(--muted);" id="statusLocation">Unknown</span>
       </div>
     </div>
   </main>
 
-  <main class="tab-content" id="tab-status">
-    <div class="card">
+  <main class="tab-content" id="tab-status" role="tabpanel">
+    <div class="card" id="telemetryCard">
       <div class="sec-title">Bot Telemetry</div>
-      <div class="data-row">
+      <div class="data-row" id="rowLocation">
         <span class="row-label">Location</span>
         <span class="row-val location" id="location">-</span>
       </div>
-      <div class="data-row">
-        <span class="row-label">Status Message</span>
-        <span class="row-val status" id="statusDetail">-</span>
+      <div class="data-row" id="rowStatus">
+        <span class="row-label">Status</span>
+        <span class="row-val status offline" id="statusDetail">Offline</span>
       </div>
-      <div class="data-row">
+      <div class="data-row" id="rowNextSell">
         <span class="row-label">Next Sale</span>
         <span class="row-val" id="nextSell">-</span>
       </div>
-      <div class="data-row">
-        <span class="row-label">Last Payment</span>
+      <div class="data-row" id="rowLastPay">
+        <span class="row-label">Last Pay</span>
         <span class="row-val" id="lastPayment">-</span>
       </div>
-      <div class="data-row">
+      <div class="data-row" id="rowTodayPaid">
         <span class="row-label">Paid Today</span>
         <span class="row-val" id="todayPaid">-</span>
       </div>
     </div>
   </main>
 
-  <main class="tab-content" id="tab-payments">
+  <main class="tab-content" id="tab-controls" role="tabpanel">
+
     <div class="card">
-      <div class="sec-title">Calculated Payouts</div>
-      <div class="data-row">
-        <span class="row-label">The Empire</span>
-        <span class="row-val" id="payTheEmpire" style="color: var(--gold);">$1,000,000</span>
+      <div class="sec-title">Quick Actions</div>
+      <div class="control-grid">
+        <button class="cmd-btn success" onclick="sendCommand('JUMP')">
+          <i data-lucide="arrow-up-circle"></i> Jump
+        </button>
+        <button class="cmd-btn warning" onclick="sendCommand('RELOG')">
+          <i data-lucide="refresh-cw"></i> Relog
+        </button>
+        <button class="cmd-btn blue" onclick="sendCommand('GO_HOME')">
+          <i data-lucide="home"></i> Go Home
+        </button>
       </div>
-      <div class="data-row">
-        <span class="row-label">Gojo</span>
-        <span class="row-val" id="payBilalskingdom" style="color: var(--blue);">$428,571</span>
+    </div>
+
+    <div class="card">
+      <div class="sec-title">Send Chat Message</div>
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Type ingame message..." autocomplete="off">
+        <button class="cmd-btn success chat-send-btn" onclick="sendChatMessage()">
+          <i data-lucide="send"></i> Send
+        </button>
       </div>
-      <div class="data-row">
-        <span class="row-label">Matthias</span>
-        <span class="row-val" id="payMatthias" style="color: var(--purple);">$0</span>
-      </div>
-      <div class="data-row">
-        <span class="row-label">Expenses / Fees</span>
-        <span class="row-val" id="payExpenses" style="color: var(--red);">$0</span>
-      </div>
-      
-      <div class="pay-total">
-        <span>Remaining</span>
-        <span class="val" id="payYourShare">$0</span>
-      </div>
+    </div>
+
+  </main>
+
+  <main class="tab-content" id="tab-payments" role="tabpanel">
+    <div class="card">
+      <div class="sec-title">Payouts</div>
+      <div class="data-row"><span class="row-label">Empire</span><span class="row-val gold">$1,000,000</span></div>
+      <div class="data-row"><span class="row-label">Gojo</span><span class="row-val blue">$428,571</span></div>
+      <div class="data-row"><span class="row-label">Matthias (30%)</span><span class="row-val purple" id="payMatthias">$0</span></div>
+      <div class="data-row"><span class="row-label">Fees</span><span class="row-val red" id="payExpenses">$0</span></div>
+      <div class="pay-total"><span>Share</span><span class="val" id="payYourShare">$0</span></div>
     </div>
   </main>
 
-  <div class="footer" id="lastUpdate">Connecting to stream...</div>
+  <div class="footer" id="lastUpdate">Awaiting stream...</div>
 
-  <nav class="bottom-nav">
-    <div class="nav-item active" data-tab="tab-dashboard">
-      <i data-lucide="layout-dashboard"></i>
-      <span>Main</span>
-    </div>
-    <div class="nav-item" data-tab="tab-status">
-      <i data-lucide="activity"></i>
-      <span>Status</span>
-    </div>
-    <div class="nav-item" data-tab="tab-payments">
-      <i data-lucide="credit-card"></i>
-      <span>Payments</span>
-    </div>
+  <nav class="bottom-nav" role="tablist">
+    <div class="nav-item active" data-tab="tab-dashboard" role="tab"><i data-lucide="layout-grid"></i><span>Main</span></div>
+    <div class="nav-item" data-tab="tab-status" role="tab"><i data-lucide="zap"></i><span>Status</span></div>
+    <div class="nav-item" data-tab="tab-controls" role="tab"><i data-lucide="terminal"></i><span>Control</span></div>
+    <div class="nav-item" data-tab="tab-payments" role="tab"><i data-lucide="dollar-sign"></i><span>Pay</span></div>
   </nav>
 </div>
 
@@ -613,201 +548,310 @@
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycmdlZHhveGtlZW95amtpcXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzQ0MzYsImV4cCI6MjEwMTk1MDQzNn0.tu0GSs4Sn19XxxT1pxZM3rDG_nXPRMmUCKmcimnqk9U';
   const BOT_ID = '1415926535';
 
-  let updateCount = 0;
-  let lastUpdateTime = Date.now();
-
+  let syncCount = 0;
+  let lastSyncTime = Date.now();
+  let previousData = {};
   const $ = (id) => document.getElementById(id);
 
-  const elements = {
-    balance: $('balance'),
-    balanceCard: $('balanceCard'),
-    sellCount: $('sellCount'),
-    logins: $('logins'),
-    reconnects: $('reconnects'),
-    uptime: $('uptime'),
-    location: $('location'),
-    statusDetail: $('statusDetail'),
-    nextSell: $('nextSell'),
-    nextSellMain: $('nextSellMain'),
-    timeToPayment: $('timeToPayment'),
-    lastPayment: $('lastPayment'),
-    todayPaid: $('todayPaid'),
-    payTheEmpire: $('payTheEmpire'),
-    payBilalskingdom: $('payBilalskingdom'),
-    payMatthias: $('payMatthias'),
-    payExpenses: $('payExpenses'),
-    payYourShare: $('payYourShare'),
-    lastUpdate: $('lastUpdate'),
-    statusBadge: $('statusBadge'),
-    liveText: $('liveText'),
-    updateCount: $('updateCount'),
-    latency: $('latency'),
-    botId: $('botId')
+  const ui = {
+    balance: $('balance'), sellCount: $('sellCount'), logins: $('logins'), reconnects: $('reconnects'), uptime: $('uptime'),
+    location: $('location'), statusDetail: $('statusDetail'), nextSell: $('nextSell'), nextSellMain: $('nextSellMain'),
+    timeToPayment: $('timeToPayment'), lastPayment: $('lastPayment'), todayPaid: $('todayPaid'),
+    payMatthias: $('payMatthias'), payExpenses: $('payExpenses'), payYourShare: $('payYourShare'),
+    lastUpdate: $('lastUpdate'), statusBadge: $('statusBadge'), liveText: $('liveText'),
+    updateCount: $('updateCount'), latency: $('latency'), botId: $('botId'),
+    statusIndicator: $('statusIndicator'), statusText: $('statusText'), statusLocation: $('statusLocation'),
+    lastUpdateTime: $('lastUpdateTime')
   };
 
-  function formatBalance(val) {
-    return '$' + (parseFloat(val) || 0).toLocaleString('en-US');
-  }
-
-  function formatCurrency(val) {
-    return '$' + Number(val || 0).toLocaleString('en-US');
-  }
-
-  function formatTime(timestamp) {
-    if (!timestamp || timestamp === 'Never') return 'Never';
+  // --- COMMAND SEND ---
+  async function sendCommand(commandName, payload = null) {
+    ui.lastUpdate.textContent = `Sending ${commandName}...`;
     try {
-      return new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    } catch { return timestamp; }
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const insertData = { bot_id: BOT_ID, command: commandName, status: 'pending' };
+      if (payload) insertData.payload = payload;
+      const { error } = await supabase.from('bot_commands').insert([insertData]);
+      if (error) throw error;
+      ui.lastUpdate.textContent = `✅ ${commandName} sent!`;
+      setTimeout(() => { ui.lastUpdate.textContent = 'Ready'; }, 3000);
+    } catch (err) {
+      console.error(err);
+      ui.lastUpdate.textContent = `❌ Failed to send command`;
+    }
   }
 
-  function formatUptime(seconds) {
-    const num = parseInt(seconds) || 0;
-    const days = Math.floor(num / 86400);
-    const hours = Math.floor((num % 86400) / 3600);
-    const minutes = Math.floor((num % 3600) / 60);
-
-    if (days > 0) return `${days}d ${hours}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m`;
+  function sendChatMessage() {
+    const input = $('chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+    sendCommand('CHAT', message);
+    input.value = '';
   }
 
-  function formatDate(timestamp) {
-    if (!timestamp) return '-';
-    try {
-      return new Date(timestamp).toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    } catch { return timestamp; }
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatInput = $('chatInput');
+    if (chatInput) {
+      chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+      });
+    }
+  });
+
+  // --- HELPERS ---
+  const formatVC = (v) => '$' + (parseFloat(v) || 0).toLocaleString('en-US');
+  const formatCur = (v) => '$' + Math.round(v || 0).toLocaleString('en-US');
+
+  function formatTime(ts) {
+    if (!ts || ts === 'Never') return '-';
+    try { return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); }
+    catch { return '-'; }
+  }
+
+  function formatUptime(s) {
+    const n = parseInt(s) || 0;
+    const h = Math.floor(n / 3600);
+    const m = Math.floor((n % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
+
+  function formatDate(ts) {
+    if (!ts) return '-';
+    try { return new Date(ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+    catch { return '-'; }
   }
 
   function adjustBalanceFontSize() {
-    const el = elements.balance;
+    const el = ui.balance;
     const parent = el.parentElement;
     el.style.fontSize = '';
     let fontSize = parseFloat(window.getComputedStyle(el).fontSize);
-    while (el.scrollWidth > parent.clientWidth && fontSize > 12) {
+    while (el.scrollWidth > parent.clientWidth && fontSize > 14) {
       fontSize -= 1;
       el.style.fontSize = fontSize + 'px';
     }
   }
 
-  function calculateAndRenderPayouts(totalBalans, rawExpenses) {
-    const balance = parseFloat(totalBalans) || 0;
+  // --- UPDATE FUNCTIONS ---
+  function getStatusType(status, location) {
+    const statusLower = (status || '').toLowerCase();
+    const locationLower = (location || '').toLowerCase();
 
-    const empirePay = 1000000;
-    const bilalPay = 428571;
-
-    const remainingAfterFixed = Math.max(0, balance - empirePay - bilalPay);
-
-    const matthiasPay = remainingAfterFixed * 0.30;
-    const expenses = parseFloat(rawExpenses) || 0;
-
-    const yourProfit = Math.max(0, remainingAfterFixed - matthiasPay - expenses);
-
-    elements.payTheEmpire.textContent = formatCurrency(empirePay);
-    elements.payBilalskingdom.textContent = formatCurrency(bilalPay);
-    elements.payMatthias.textContent = formatCurrency(Math.round(matthiasPay));
-    elements.payExpenses.textContent = formatCurrency(Math.round(expenses));
-    elements.payYourShare.textContent = formatCurrency(Math.round(yourProfit));
+    if (statusLower.includes('offline') || statusLower.includes('error') || statusLower.includes('disconnect')) {
+      return 'offline';
+    }
+    if (locationLower.includes('lobby') || statusLower.includes('lobby')) {
+      return 'lobby';
+    }
+    if (locationLower.includes('survival') || statusLower.includes('survival') || statusLower.includes('selling')) {
+      return 'survival';
+    }
+    if (statusLower.includes('online') || statusLower.includes('live') || statusLower.includes('connected')) {
+      return 'online';
+    }
+    return 'offline';
   }
 
   function updateUI(data) {
     if (!data) return;
 
     const now = Date.now();
-    elements.latency.textContent = Math.max(0, now - lastUpdateTime) + 'ms';
-    lastUpdateTime = now;
-    updateCount++;
+    ui.latency.textContent = Math.max(0, now - lastSyncTime) + 'ms';
+    lastSyncTime = now;
+    syncCount++;
+    ui.updateCount.textContent = syncCount;
 
-    elements.updateCount.textContent = updateCount;
-    elements.balance.textContent = formatBalance(data.balans);
+    // Check for location/status changes
+    const locationChanged = previousData.location !== data.location;
+    const statusChanged = previousData.status !== data.status;
+    const balanceChanged = previousData.balans !== data.balans;
 
+    // Update balance with animation
+    ui.balance.textContent = formatVC(data.balans);
     adjustBalanceFontSize();
+    if (balanceChanged) {
+      ui.balance.classList.add('pulse');
+      setTimeout(() => ui.balance.classList.remove('pulse'), 500);
+    }
 
-    elements.balanceCard.classList.add('updating');
-    elements.balance.classList.add('pulse');
-    setTimeout(() => {
-      elements.balanceCard.classList.remove('updating');
-      elements.balance.classList.remove('pulse');
-    }, 300);
+    // Update status badge
+    const statusType = getStatusType(data.status, data.location);
+    ui.statusBadge.className = 'status-badge ' + statusType;
+    ui.liveText.textContent = statusType === 'offline' ? 'Offline' :
+                              statusType === 'lobby' ? 'Lobby' :
+                              statusType === 'survival' ? 'Survival' : 'Live';
 
-    const isOnline = data.status && !data.status.toLowerCase().includes('offline') && !data.status.toLowerCase().includes('error');
-    elements.statusBadge.className = 'status-badge' + (isOnline ? '' : ' offline');
-    elements.liveText.textContent = isOnline ? 'Live' : 'Offline';
+    // Update status indicator
+    ui.statusIndicator.className = 'status-indicator ' + statusType;
+    ui.statusText.textContent = statusType === 'offline' ? 'Offline' :
+                                statusType === 'lobby' ? 'In Lobby' :
+                                statusType === 'survival' ? 'In Survival' : 'Online';
+    ui.statusLocation.textContent = data.location || 'Unknown';
 
-    elements.sellCount.textContent = data.sell_count || '0';
-    elements.logins.textContent = data.logins || '0';
-    elements.reconnects.textContent = data.reconnects || '0';
-    elements.uptime.textContent = formatUptime(data.uptime);
+    // Update metrics
+    ui.sellCount.textContent = data.sell_count || '0';
+    ui.logins.textContent = data.logins || '0';
+    ui.reconnects.textContent = data.reconnects || '0';
+    ui.uptime.textContent = formatUptime(data.uptime);
 
-    elements.location.textContent = data.location || 'Unknown';
-    elements.statusDetail.textContent = data.status || 'Unknown';
-    elements.statusDetail.className = 'row-val status' + (isOnline ? '' : ' offline');
+    // Update telemetry
+    ui.location.textContent = data.location || 'Unknown';
+    ui.statusDetail.textContent = data.status || 'Unknown';
+    ui.statusDetail.className = 'row-val status ' + statusType;
 
-    elements.nextSell.textContent = data.next_sell || 'N/A';
-    elements.nextSellMain.textContent = data.next_sell || 'N/A';
-    elements.timeToPayment.textContent = data.time_to_payment || 'N/A';
-    elements.lastPayment.textContent = formatTime(data.payments_last);
+    // Update timers
+    ui.nextSell.textContent = data.next_sell || 'N/A';
+    ui.nextSellMain.textContent = data.next_sell || 'N/A';
+    ui.timeToPayment.textContent = data.time_to_payment || 'N/A';
+    ui.lastPayment.textContent = formatTime(data.payments_last);
 
-    elements.todayPaid.innerHTML = data.today_paid === 'Yes'
+    // Update today paid
+    ui.todayPaid.innerHTML = data.today_paid === 'Yes'
       ? '<span class="badge yes">Yes</span>'
       : '<span class="badge no">No</span>';
 
-    calculateAndRenderPayouts(data.balans, data.expenses);
+    // Update payouts
+    updatePayouts(data.balans, data.expenses);
 
-    elements.lastUpdate.textContent = 'Last sync: ' + formatDate(data.timestamp);
+    // Highlight changes
+    if (locationChanged) {
+      flashElement('rowLocation');
+      flashElement('statusCard');
+    }
+    if (statusChanged) {
+      flashElement('rowStatus');
+      flashElement('statusCard');
+    }
+
+    // Update last sync time
+    ui.lastUpdateTime.textContent = formatDate(data.timestamp);
+    ui.lastUpdate.textContent = 'Last sync: ' + formatDate(data.timestamp);
+
+    // Store previous data
+    previousData = { ...data };
   }
 
-  /* TABS SYSTEM */
-  document.querySelectorAll('.nav-item').forEach(tab => {
-    tab.addEventListener('click', () => {
+  function updatePayouts(balans, expenses) {
+    const balance = parseFloat(balans) || 0;
+    const exp = parseFloat(expenses) || 0;
+
+    const empirePay = 1000000;
+    const bilalPay = 428571;
+    const remainingAfterFixed = Math.max(0, balance - empirePay - bilalPay);
+    const matthiasPay = remainingAfterFixed * 0.30;
+    const yourProfit = Math.max(0, remainingAfterFixed - matthiasPay - exp);
+
+    ui.payMatthias.textContent = formatCur(matthiasPay);
+    ui.payExpenses.textContent = formatCur(exp);
+    ui.payYourShare.textContent = formatCur(yourProfit);
+  }
+
+  function flashElement(elementId) {
+    const el = typeof elementId === 'string' ? $(elementId) : elementId;
+    if (!el) return;
+    el.classList.remove('updated');
+    // Trigger reflow
+    void el.offsetWidth;
+    el.classList.add('updated');
+    setTimeout(() => {
+      el.classList.remove('updated');
+    }, 1000);
+  }
+
+  // --- TABS SYSTEM ---
+  document.querySelectorAll('.nav-item').forEach(nav => {
+    nav.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-      tab.classList.add('active');
-      $(tab.dataset.tab).classList.add('active');
+      nav.classList.add('active');
+      $(nav.dataset.tab).classList.add('active');
     });
   });
 
-  /* LIGHT / DARK MODE TOGGLE */
+  // --- THEME TOGGLE ---
   const themeToggle = $('themeToggle');
+  const themeIcon = $('themeIcon');
   let isDark = true;
 
   themeToggle.addEventListener('click', () => {
     isDark = !isDark;
     if (isDark) {
       document.documentElement.removeAttribute('data-theme');
-      $('themeIcon').setAttribute('data-lucide', 'moon');
+      themeIcon.setAttribute('data-lucide', 'sun');
     } else {
       document.documentElement.setAttribute('data-theme', 'light');
-      $('themeIcon').setAttribute('data-lucide', 'sun');
+      themeIcon.setAttribute('data-lucide', 'moon');
     }
     lucide.createIcons();
   });
 
-  /* REALTIME SUPABASE */
+  // --- SUPABASE REALTIME ---
   function initRealtime() {
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    supabaseClient
+    // Subscribe to realtime changes
+    supabase
       .channel('bot_stats_changes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bot_stats', filter: `id=eq.${BOT_ID}` }, payload => {
-        if (payload.new) updateUI(payload.new);
-      })
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bot_stats',
+          filter: `id=eq.${BOT_ID}`
+        },
+        payload => {
+          if (payload.new) {
+            updateUI(payload.new);
+          }
+        }
+      )
       .subscribe(status => {
-        if (status === 'SUBSCRIBED') elements.lastUpdate.textContent = 'Realtime connected - awaiting stream...';
+        if (status === 'SUBSCRIBED') {
+          ui.lastUpdate.textContent = 'Realtime connected';
+        }
       });
+
+    // Also poll for updates as backup
+    setInterval(async () => {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+          updateUI(data[0]);
+        }
+      } catch (err) {
+        console.error('Poll error:', err);
+      }
+    }, 2000);
   }
 
+  // --- INIT ---
   function init() {
-    elements.botId.textContent = `ID: ${BOT_ID}`;
+    ui.botId.textContent = `ID: ${BOT_ID}`;
     lucide.createIcons();
-    initRealtime();
 
+    // Initial fetch
     fetch(`${SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
     })
     .then(res => res.json())
-    .then(data => { if (data && data.length > 0) updateUI(data[0]); })
+    .then(data => {
+      if (data && data.length > 0) {
+        updateUI(data[0]);
+      }
+    })
     .catch(err => console.error('Error loading initial state:', err));
+
+    // Start realtime
+    initRealtime();
   }
 
   window.addEventListener('resize', adjustBalanceFontSize);
