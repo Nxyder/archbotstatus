@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MoneyBot App</title>
+  <title>Bot Dashboard</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,7 @@
       --gold: #ffd60a;
       --purple: #bf5af2;
       --orange: #ff9500;
+      --cyan: #5ac8fa;
       --font-main: 'Plus Jakarta Sans', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
@@ -49,7 +50,6 @@
       position: relative;
     }
 
-    /* --- STARFIELD BACKGROUND --- */
     .starfield {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -84,7 +84,6 @@
     .star:nth-child(11) { width: 1px; height: 1px; top: 5%;  left: 40%; animation-duration: 3s; }
     .star:nth-child(12) { width: 2px; height: 2px; top: 95%; left: 80%; animation-duration: 2.5s; }
 
-    /* --- APP LAYOUT --- */
     .app {
       width: 100%;
       max-width: 400px;
@@ -93,7 +92,6 @@
       z-index: 1;
     }
 
-    /* --- HEADER --- */
     .header {
       padding: 30px 20px 15px;
       display: flex;
@@ -145,7 +143,6 @@
 
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
 
-    /* --- TELEMETRY --- */
     .telemetry {
       margin: 10px 20px 20px; padding: 10px;
       border-bottom: 1px solid var(--border);
@@ -154,7 +151,6 @@
     }
     .telemetry strong { color: var(--text); font-weight: 400; }
 
-    /* --- MAIN CONTENT --- */
     .tab-content { display: none; padding: 0 20px; animation: fadeIn 0.3s ease-out; }
     .tab-content.active { display: block; }
 
@@ -187,6 +183,72 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
+
+    /* --- STATUS INDICATOR ROW --- */
+    .status-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+    .status-indicator .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .status-indicator .status-label {
+      font-size: 0.6rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 2px;
+    }
+
+    .status-indicator .status-main {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .status-spacer {
+      margin-left: auto;
+      font-size: 0.6rem;
+      color: var(--muted);
+    }
+
+    /* Status indicator colors */
+    .status-indicator.online { background: rgba(50, 215, 75, 0.08); color: var(--green); }
+    .status-indicator.online .status-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .status-indicator.online .status-main { color: var(--green); }
+
+    .status-indicator.offline { background: rgba(255, 69, 58, 0.08); color: var(--red); }
+    .status-indicator.offline .status-dot { background: var(--red); }
+    .status-indicator.offline .status-main { color: var(--red); }
+
+    .status-indicator.lobby { background: rgba(255, 149, 0, 0.08); color: var(--orange); }
+    .status-indicator.lobby .status-dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
+    .status-indicator.lobby .status-main { color: var(--orange); }
+
+    .status-indicator.survival { background: rgba(50, 215, 75, 0.10); color: var(--green); }
+    .status-indicator.survival .status-dot { background: var(--green); box-shadow: 0 0 15px var(--green); animation: pulse 0.8s infinite; }
+    .status-indicator.survival .status-main { color: var(--green); }
+
+    .status-indicator.limbo { background: rgba(255, 69, 58, 0.08); color: var(--red); }
+    .status-indicator.limbo .status-dot { background: var(--red); }
+    .status-indicator.limbo .status-main { color: var(--red); }
 
     /* --- BALANCE --- */
     .balance-card { text-align: center; border-color: rgba(255, 214, 10, 0.2); }
@@ -231,35 +293,12 @@
     .blue { color: var(--blue); }
     .orange { color: var(--orange); }
     .red { color: var(--red); }
-
-    /* --- STATUS INDICATOR --- */
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      transition: all 0.3s;
-    }
-    .status-indicator .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      transition: all 0.3s;
-    }
-    .status-indicator.online { background: rgba(50, 215, 75, 0.1); color: var(--green); }
-    .status-indicator.online .status-dot { background: var(--green); box-shadow: 0 0 10px var(--green); }
-    .status-indicator.offline { background: rgba(255, 69, 58, 0.1); color: var(--red); }
-    .status-indicator.offline .status-dot { background: var(--red); }
-    .status-indicator.lobby { background: rgba(255, 149, 0, 0.1); color: var(--orange); }
-    .status-indicator.lobby .status-dot { background: var(--orange); box-shadow: 0 0 10px var(--orange); }
-    .status-indicator.survival { background: rgba(50, 215, 75, 0.15); color: var(--green); }
-    .status-indicator.survival .status-dot { background: var(--green); box-shadow: 0 0 15px var(--green); animation: pulse 0.8s infinite; }
+    .cyan { color: var(--cyan); }
 
     /* --- DATA ROWS --- */
     .sec-title { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .sec-title.money { color: var(--gold); }
+    .sec-title.afk { color: var(--cyan); }
     .data-row {
       display: flex; justify-content: space-between; align-items: center;
       padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;
@@ -306,8 +345,8 @@
     .cmd-btn.danger:hover { color: var(--red); border-color: var(--red); box-shadow: 0 0 12px rgba(255, 69, 58, 0.2); }
     .cmd-btn.warning:hover { color: var(--gold); border-color: var(--gold); box-shadow: 0 0 12px rgba(255, 214, 10, 0.2); }
     .cmd-btn.blue:hover { color: var(--blue); border-color: var(--blue); box-shadow: 0 0 12px rgba(0, 122, 255, 0.2); }
+    .cmd-btn.cyan:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px rgba(90, 200, 250, 0.2); }
 
-    /* Custom Chat Input */
     .chat-input-wrap {
       display: flex;
       gap: 8px;
@@ -327,18 +366,10 @@
       transition: border-color 0.2s;
     }
 
-    .chat-input-wrap input:focus {
-      border-color: var(--blue);
-    }
+    .chat-input-wrap input:focus { border-color: var(--blue); }
+    .chat-input-wrap input::placeholder { color: var(--muted); }
 
-    .chat-input-wrap input::placeholder {
-      color: var(--muted);
-    }
-
-    .chat-send-btn {
-      padding: 10px 16px;
-      flex-direction: row;
-    }
+    .chat-send-btn { padding: 10px 16px; flex-direction: row; }
 
     /* --- PAYMENTS --- */
     .pay-total {
@@ -375,15 +406,8 @@
     .nav-item i { width: 16px; height: 16px; transition: transform 0.2s; }
     .nav-item.active i { transform: translateY(-1px); }
 
-    /* Update notification */
-    .update-flash {
-      animation: flashUpdate 0.5s ease;
-    }
-    @keyframes flashUpdate {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
+    .update-flash { animation: flashUpdate 0.5s ease; }
+    @keyframes flashUpdate { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   </style>
 </head>
 <body>
@@ -397,7 +421,7 @@
 <div class="app">
   <header class="header">
     <div>
-      <div class="app-title">MoneyBot</div>
+      <div class="app-title">Bot Dashboard</div>
       <div class="bot-id" id="botId">ID: --</div>
     </div>
     <div class="header-actions">
@@ -418,6 +442,7 @@
   </div>
 
   <main class="tab-content active" id="tab-dashboard" role="tabpanel">
+    <!-- MoneyBot Section -->
     <div class="card balance-card" id="balanceCard">
       <div class="balance-label">Vault Balance</div>
       <div class="balance-wrap">
@@ -455,20 +480,34 @@
       </div>
     </div>
 
-    <!-- Status Indicator -->
-    <div class="card" id="statusCard">
-      <div class="sec-title">Bot Status</div>
-      <div class="status-indicator offline" id="statusIndicator">
-        <span class="status-dot"></span>
-        <span id="statusText">Offline</span>
-        <span style="margin-left:auto; font-size:0.6rem; color:var(--muted);" id="statusLocation">Unknown</span>
+    <!-- Status Cards - 2 Bots in 1 clean section -->
+    <div class="card">
+      <div class="status-row">
+
+        <!-- Money Bot Status -->
+        <div class="status-indicator offline" id="statusIndicator">
+          <span class="status-dot"></span>
+          <span class="status-label">Money</span>
+          <span class="status-main" id="statusText">Offline</span>
+          <span class="status-spacer" id="statusLocation">Unknown</span>
+        </div>
+
+        <!-- AFK Bot Status -->
+        <div class="status-indicator offline" id="afkStatusIndicator">
+          <span class="status-dot"></span>
+          <span class="status-label">AFK</span>
+          <span class="status-main" id="afkStatusText">Offline</span>
+          <span class="status-spacer" id="afkStatusLocation">Unknown</span>
+        </div>
+
       </div>
     </div>
+
   </main>
 
   <main class="tab-content" id="tab-status" role="tabpanel">
     <div class="card" id="telemetryCard">
-      <div class="sec-title">Bot Telemetry</div>
+      <div class="sec-title money">Money Bot</div>
       <div class="data-row" id="rowLocation">
         <span class="row-label">Location</span>
         <span class="row-val location" id="location">-</span>
@@ -490,10 +529,25 @@
         <span class="row-val" id="todayPaid">-</span>
       </div>
     </div>
+
+    <div class="card afk-card">
+      <div class="sec-title afk">AFK Bot</div>
+      <div class="data-row">
+        <span class="row-label">Location</span>
+        <span class="row-val" id="afkLocationDetail" style="color:var(--cyan);">-</span>
+      </div>
+      <div class="data-row">
+        <span class="row-label">Spawners</span>
+        <span class="row-val" id="afkSpawnersDetail" style="color:var(--gold);">0</span>
+      </div>
+      <div class="data-row">
+        <span class="row-label">Last Update</span>
+        <span class="row-val" style="color:var(--muted);font-size:0.7rem;" id="afkTimestampDetail">-</span>
+      </div>
+    </div>
   </main>
 
   <main class="tab-content" id="tab-controls" role="tabpanel">
-
     <div class="card">
       <div class="sec-title">Quick Actions</div>
       <div class="control-grid">
@@ -518,12 +572,11 @@
         </button>
       </div>
     </div>
-
   </main>
 
   <main class="tab-content" id="tab-payments" role="tabpanel">
     <div class="card">
-      <div class="sec-title">Payouts</div>
+      <div class="sec-title money">Payouts</div>
       <div class="data-row"><span class="row-label">Empire</span><span class="row-val gold">$1,000,000</span></div>
       <div class="data-row"><span class="row-label">Gojo</span><span class="row-val blue">$500,000</span></div>
       <div class="data-row"><span class="row-label">Matthias</span><span class="row-val purple" id="payMatthias">$0</span></div>
@@ -546,13 +599,25 @@
 <script>
   const MATTHIAS_DAILY_FIXED = 3000000;
 
-  const SUPABASE_URL = 'https://rrrgedxoxkeeoyjkiqpt.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycmdlZHhveGtlZW95amtpcXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzQ0MzYsImV4cCI6MjEwMTk1MDQzNn0.tu0GSs4Sn19XxxT1pxZM3rDG_nXPRMmUCKmcimnqk9U';
+  // ============================================================
+  // MONEYBOT SUPABASE
+  // ============================================================
+  const MB_SUPABASE_URL = 'https://rrrgedxoxkeeoyjkiqpt.supabase.co';
+  const MB_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycmdlZHhveGtlZW95amtpcXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNzQ0MzYsImV4cCI6MjEwMTk1MDQzNn0.tu0GSs4Sn19XxxT1pxZM3rDG_nXPRMmUCKmcimnqk9U';
+
+  // ============================================================
+  // AFK BOT SUPABASE
+  // ============================================================
+  const AFK_SUPABASE_URL = 'https://ggxdzutqhpboyubwejfk.supabase.co';
+  const AFK_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdneGR6dXRxaHBib3l1YndlamZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NzQyMTMsImV4cCI6MjEwMjA1MDIxM30.OeeGhJRdRNSyil1PtSfb_NLELRKorS3k90ZeGGnbGLg';
+
   const BOT_ID = '1415926535';
+  const AFK_BOT_ID = '1415926536';
 
   let syncCount = 0;
   let lastSyncTime = Date.now();
   let previousData = {};
+  let afkPreviousData = {};
   const $ = (id) => document.getElementById(id);
 
   const ui = {
@@ -563,14 +628,19 @@
     lastUpdate: $('lastUpdate'), statusBadge: $('statusBadge'), liveText: $('liveText'),
     updateCount: $('updateCount'), latency: $('latency'), botId: $('botId'),
     statusIndicator: $('statusIndicator'), statusText: $('statusText'), statusLocation: $('statusLocation'),
-    lastUpdateTime: $('lastUpdateTime')
+    lastUpdateTime: $('lastUpdateTime'),
+    // AFK UI elements
+    afkLocation: $('afkLocation'), afkSpawners: $('afkSpawners'), afkTimestamp: $('afkTimestamp'),
+    afkLocationDetail: $('afkLocationDetail'), afkSpawnersDetail: $('afkSpawnersDetail'),
+    afkTimestampDetail: $('afkTimestampDetail'),
+    afkStatusIndicator: $('afkStatusIndicator'), afkStatusText: $('afkStatusText'), afkStatusLocation: $('afkStatusLocation')
   };
 
   // --- COMMAND SEND ---
   async function sendCommand(commandName, payload = null) {
     ui.lastUpdate.textContent = `Sending ${commandName}...`;
     try {
-      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const supabase = window.supabase.createClient(MB_SUPABASE_URL, MB_SUPABASE_KEY);
       const insertData = { bot_id: BOT_ID, command: commandName, status: 'pending' };
       if (payload) insertData.payload = payload;
       const { error } = await supabase.from('bot_commands').insert([insertData]);
@@ -654,7 +724,7 @@
     return 'offline';
   }
 
-  function updateUI(data) {
+  function updateMoneyBotUI(data) {
     if (!data) return;
 
     const now = Date.now();
@@ -663,12 +733,10 @@
     syncCount++;
     ui.updateCount.textContent = syncCount;
 
-    // Check for location/status changes
     const locationChanged = previousData.location !== data.location;
     const statusChanged = previousData.status !== data.status;
     const balanceChanged = previousData.balans !== data.balans;
 
-    // Update balance with animation
     ui.balance.textContent = formatVC(data.balans);
     adjustBalanceFontSize();
     if (balanceChanged) {
@@ -676,75 +744,133 @@
       setTimeout(() => ui.balance.classList.remove('pulse'), 500);
     }
 
-    // Update status badge
     const statusType = getStatusType(data.status, data.location);
     ui.statusBadge.className = 'status-badge ' + statusType;
     ui.liveText.textContent = statusType === 'offline' ? 'Offline' :
                               statusType === 'lobby' ? 'Lobby' :
                               statusType === 'survival' ? 'Survival' : 'Live';
 
-    // Update status indicator
     ui.statusIndicator.className = 'status-indicator ' + statusType;
-    ui.statusText.textContent = statusType === 'offline' ? 'Offline' :
-                                statusType === 'lobby' ? 'In Lobby' :
-                                statusType === 'survival' ? 'In Survival' : 'Online';
+
+    let mainText = data.location || 'Unknown';
+    if (statusType === 'offline') {
+      mainText = 'Offline';
+    } else if (statusType === 'lobby') {
+      mainText = 'Lobby';
+    } else if (statusType === 'survival') {
+      mainText = 'Survival';
+    } else if (statusType === 'online') {
+      mainText = 'Online';
+    }
+
+    ui.statusText.textContent = mainText;
     ui.statusLocation.textContent = data.location || 'Unknown';
 
-    // Update metrics
     ui.sellCount.textContent = data.sell_count || '0';
     ui.logins.textContent = data.logins || '0';
     ui.reconnects.textContent = data.reconnects || '0';
     ui.uptime.textContent = formatUptime(data.uptime);
 
-    // Update telemetry
     ui.location.textContent = data.location || 'Unknown';
     ui.statusDetail.textContent = data.status || 'Unknown';
     ui.statusDetail.className = 'row-val status ' + statusType;
 
-    // Update timers
     ui.nextSell.textContent = data.next_sell || 'N/A';
     ui.nextSellMain.textContent = data.next_sell || 'N/A';
     ui.timeToPayment.textContent = data.time_to_payment || 'N/A';
     ui.lastPayment.textContent = formatTime(data.payments_last);
 
-    // Update today paid
     ui.todayPaid.innerHTML = data.today_paid === 'Yes'
       ? '<span class="badge yes">Yes</span>'
       : '<span class="badge no">No</span>';
 
-    // Update payouts - now Matthias gets $3M daily fixed
     updatePayouts(data.balans, data.expenses);
 
-    // Highlight changes
     if (locationChanged) {
       flashElement('rowLocation');
-      flashElement('statusCard');
     }
     if (statusChanged) {
       flashElement('rowStatus');
-      flashElement('statusCard');
     }
 
-    // Update last sync time
     ui.lastUpdateTime.textContent = formatDate(data.timestamp);
     ui.lastUpdate.textContent = 'Last sync: ' + formatDate(data.timestamp);
 
-    // Store previous data
     previousData = { ...data };
+  }
+
+  // --- UPDATE AFK BOT UI ---
+  function updateAfkBotUI(data) {
+    if (!data) return;
+
+    let location = data.location || 'Unknown';
+    let cleanLocation = location;
+    let displayLocation = location;
+
+    if (typeof location === 'string') {
+      const lower = location.toLowerCase();
+      if (lower.includes('survival')) {
+        cleanLocation = 'Survival';
+        displayLocation = 'Survival';
+      } else if (lower.includes('lobby')) {
+        cleanLocation = 'Lobby';
+        displayLocation = 'Lobby';
+      } else if (lower.includes('limbo')) {
+        cleanLocation = 'Limbo';
+        displayLocation = 'Limbo';
+      } else {
+        cleanLocation = location;
+        displayLocation = location;
+      }
+    }
+
+    const spawners = data.spawners || 0;
+    const timestamp = data.timestamp;
+
+    const statusType = cleanLocation === 'Survival' ? 'survival' :
+                       cleanLocation === 'Lobby' ? 'lobby' :
+                       cleanLocation === 'Limbo' ? 'limbo' : 'offline';
+
+    ui.afkStatusIndicator.className = 'status-indicator ' + statusType;
+
+    let mainText = cleanLocation || 'Unknown';
+    if (statusType === 'offline') {
+      mainText = 'Offline';
+    } else if (statusType === 'lobby') {
+      mainText = 'Lobby';
+    } else if (statusType === 'survival') {
+      mainText = 'Survival';
+    } else if (statusType === 'limbo') {
+      mainText = 'Limbo';
+    }
+
+    ui.afkStatusText.textContent = mainText;
+    ui.afkStatusLocation.textContent = displayLocation;
+
+    ui.afkLocationDetail.textContent = displayLocation;
+    ui.afkLocationDetail.style.color = cleanLocation === 'Survival' ? '#32d74b' :
+                                        cleanLocation === 'Lobby' ? '#ff9500' :
+                                        cleanLocation === 'Limbo' ? '#ff453a' : '#666666';
+
+    ui.afkSpawnersDetail.textContent = spawners;
+
+    if (timestamp) {
+      const date = new Date(timestamp);
+      ui.afkTimestampDetail.textContent = date.toLocaleString();
+    }
+
+    afkPreviousData = { ...data };
   }
 
   function updatePayouts(balans, expenses) {
     const balance = parseFloat(balans) || 0;
     const exp = parseFloat(expenses) || 0;
 
-    // Fixed payouts
     const empirePay = 1000000;
     const gojoPay = 500000;
-    const matthiasPay = MATTHIAS_DAILY_FIXED; // $3,000,000 fixed daily
+    const matthiasPay = MATTHIAS_DAILY_FIXED;
 
-    // Remaining after fixed payouts
     const remainingAfterFixed = Math.max(0, balance - empirePay - gojoPay - matthiasPay);
-    // Your share is what remains after fees
     const yourShare = Math.max(0, remainingAfterFixed - exp);
 
     ui.payMatthias.textContent = formatCur(matthiasPay);
@@ -756,7 +882,6 @@
     const el = typeof elementId === 'string' ? $(elementId) : elementId;
     if (!el) return;
     el.classList.remove('updated');
-    // Trigger reflow
     void el.offsetWidth;
     el.classList.add('updated');
     setTimeout(() => {
@@ -793,9 +918,8 @@
 
   // --- SUPABASE REALTIME ---
   function initRealtime() {
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase.createClient(MB_SUPABASE_URL, MB_SUPABASE_KEY);
 
-    // Subscribe to realtime changes
     supabase
       .channel('bot_stats_changes')
       .on('postgres_changes',
@@ -807,7 +931,7 @@
         },
         payload => {
           if (payload.new) {
-            updateUI(payload.new);
+            updateMoneyBotUI(payload.new);
           }
         }
       )
@@ -817,46 +941,85 @@
         }
       });
 
-    // Also poll for updates as backup
+    const afkSupabase = window.supabase.createClient(AFK_SUPABASE_URL, AFK_SUPABASE_KEY);
+    afkSupabase
+      .channel('bot_data_changes')
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bot_data',
+          filter: `bot_id=eq.${AFK_BOT_ID}`
+        },
+        payload => {
+          if (payload.new) {
+            updateAfkBotUI(payload.new);
+          }
+        }
+      )
+      .subscribe();
+
     setInterval(async () => {
       try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
+        const mbResponse = await fetch(`${MB_SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
           headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
+            'apikey': MB_SUPABASE_KEY,
+            'Authorization': `Bearer ${MB_SUPABASE_KEY}`
           }
         });
-        const data = await response.json();
-        if (data && data.length > 0) {
-          updateUI(data[0]);
+        const mbData = await mbResponse.json();
+        if (mbData && mbData.length > 0) {
+          updateMoneyBotUI(mbData[0]);
         }
-      } catch (err) {
-        console.error('Poll error:', err);
-      }
+      } catch (err) {}
+
+      try {
+        const afkResponse = await fetch(`${AFK_SUPABASE_URL}/rest/v1/bot_data?bot_id=eq.${AFK_BOT_ID}&select=*`, {
+          headers: {
+            'apikey': AFK_SUPABASE_KEY,
+            'Authorization': `Bearer ${AFK_SUPABASE_KEY}`
+          }
+        });
+        const afkData = await afkResponse.json();
+        if (afkData && afkData.length > 0) {
+          updateAfkBotUI(afkData[0]);
+        }
+      } catch (err) {}
     }, 2000);
   }
 
-  // --- INIT ---
   function init() {
     ui.botId.textContent = `ID: ${BOT_ID}`;
     lucide.createIcons();
 
-    // Initial fetch
-    fetch(`${SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
+    fetch(`${MB_SUPABASE_URL}/rest/v1/bot_stats?id=eq.${BOT_ID}&select=*`, {
       headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
+        'apikey': MB_SUPABASE_KEY,
+        'Authorization': `Bearer ${MB_SUPABASE_KEY}`
       }
     })
     .then(res => res.json())
     .then(data => {
       if (data && data.length > 0) {
-        updateUI(data[0]);
+        updateMoneyBotUI(data[0]);
       }
     })
     .catch(err => console.error('Error loading initial state:', err));
 
-    // Start realtime
+    fetch(`${AFK_SUPABASE_URL}/rest/v1/bot_data?bot_id=eq.${AFK_BOT_ID}&select=*`, {
+      headers: {
+        'apikey': AFK_SUPABASE_KEY,
+        'Authorization': `Bearer ${AFK_SUPABASE_KEY}`
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.length > 0) {
+        updateAfkBotUI(data[0]);
+      }
+    })
+    .catch(err => console.error('Error loading AFK bot state:', err));
+
     initRealtime();
   }
 
