@@ -523,24 +523,6 @@
         </select>
       </div>
     </div>
-
-    <div class="card">
-      <div class="sec-title settings">Local Data</div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Payment Log</div>
-          <div class="setting-desc">Location: data/payment_log.json</div>
-        </div>
-        <span style="font-size:0.6rem;color:var(--muted);">Local only</span>
-      </div>
-      <div class="setting-row">
-        <div>
-          <div class="setting-label">Total Paid Ever</div>
-          <div class="setting-desc" id="settingsTotalPaid">$0</div>
-        </div>
-        <span style="font-size:0.6rem;color:var(--muted);">Lifetime</span>
-      </div>
-    </div>
   </main>
 
   <div class="footer" id="lastUpdate">Awaiting stream...</div>
@@ -776,10 +758,6 @@
 
     $('lastUpdateTime').textContent = formatDate(data.timestamp);
     $('lastUpdate').textContent = 'Last sync: ' + formatDate(data.timestamp);
-
-    // Settings - total paid (lokaal, niet in Supabase)
-    // Deze komt uit de bot, niet uit Supabase
-    // We kunnen hem niet tonen omdat payments lokaal zijn
   }
 
   // ============================================================
